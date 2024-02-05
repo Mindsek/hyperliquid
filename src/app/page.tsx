@@ -67,7 +67,7 @@ export default function Home() {
 
             {
                 data && (
-                    <section className="grid lg:grid-cols-2 2xl:grid-cols-4 gap-4 w-[90%] mx-auto">
+                    <section className="grid lg:grid-cols-2 gap-4 w-[90%] mx-auto">
 
                         {
                             data.map((wallet: any, index: any) => {
