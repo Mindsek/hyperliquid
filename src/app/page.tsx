@@ -37,7 +37,7 @@ export default function Home() {
                 <FormAddress />
             </div>
 
-            <div className="flex mt-4 w-full max-w-2xl gap-4">
+            <div className="flex mt-4 w-full max-w-lg gap-4">
                 <div className="flex flex-col w-full gap-1">
                     <Label>Estimation price</Label>
                     <Input
@@ -67,7 +67,7 @@ export default function Home() {
 
             {
                 data && (
-                    <section className="grid lg:grid-cols-2 gap-4 w-[90%] mx-auto">
+                    <section className="grid lg:grid-cols-2 2xl:grid-cols-4 gap-4 w-[90%] mx-auto">
 
                         {
                             data.map((wallet: any, index: any) => {

@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AddressProvider>
           <Header />
-          <div className='flex-1 max-w-4xl m-auto py-4 w-full'>
+          <div className='flex-1 m-auto py-4 w-full'>
             {children}
           </div>
         </AddressProvider>
