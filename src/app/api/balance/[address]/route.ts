@@ -6,29 +6,6 @@ const addresses = [
     "0xab2e7e0e0839a970881c862b8de1ed4da599975c",
     "0xf63a392a75dd1a9452b0865f615037b5bb0b81a4",
 ]
-
-async function fetchPortfolio(address: string) {
-    const body = {
-        type: 'portfolio',
-        user: address,
-    };
-    const apiResponse = await fetch(HYPERLIQUID_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-        cache: 'no-cache',
-    });
-
-    if (!apiResponse.ok) {
-        throw new Error(`API responded with status: ${apiResponse.status}`);
-    }
-    const data = await apiResponse.json();
-    console.log(data);
-    return data[3][1]
-    // return data[3][1].vlm;
-}
 async function fetchUserData(address: string) {
     const body = {
         type: 'clearinghouseState',
@@ -49,17 +26,42 @@ async function fetchUserData(address: string) {
 
     return apiResponse.json();
 }
-export async function GET() {
+async function fetchPortfolio(address: string) {
+    const body = {
+        type: 'portfolio',
+        user: address,
+    };
+    const apiResponse = await fetch(HYPERLIQUID_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        cache: 'no-cache',
+    });
+
+    if (!apiResponse.ok) {
+        throw new Error(`API responded with status: ${apiResponse.status}`);
+    }
+    const data = await apiResponse.json();
+    console.log(data);
+    return data[3][1];
+}
+export async function GET(req: Request, context: any) {
     try {
+        const { params } = context;
+        console.log(params);
+        const addresses: string[] = params.address.match(/.{42}/g);
+        console.log(addresses);
         let balances = await Promise.all(
             addresses.map(async (address) => {
                 const data = await fetchUserData(address);
                 const anyPositions = data?.assetPositions?.map((position: any) => ({
                     asset: position.position.coin,
-                    entryPx: position.position.entryPx,
                     positionValue: position.position.positionValue,
                     marginUsed: position.position.marginUsed,
                     leverage: position.position.leverage.value,
+                    entryPx: position.position.entryPx,
                     liquidationPx: position.position.liquidationPx,
                     unrealizedPnl: position.position.unrealizedPnl,
                 }));
@@ -69,11 +71,14 @@ export async function GET() {
                 const portfolioValue = portfolio.vlm;
                 return {
                     address,
+                    totalRawUsd: data?.crossMarginSummary?.totalRawUsd,
+                    positions: anyPositions || [],
                     portfolioValue,
                     lastPnl
                 };
             })
         );
+        // return NextResponse.json("Hello World")
         return NextResponse.json(balances)
 
     } catch (error) {

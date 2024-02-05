@@ -44,10 +44,13 @@ async function fetchPortfolio(address: string) {
         throw new Error(`API responded with status: ${apiResponse.status}`);
     }
     const data = await apiResponse.json();
-    return data[3][1].vlm;
+    console.log(data);
+    return data[3][1];
 }
-export async function GET() {
+export async function GET(req: Request, context: any) {
     try {
+        const { params } = context;
+        const addresses: string[] = params.address.match(/.{42}/g);
         let balances = await Promise.all(
             addresses.map(async (address) => {
                 const data = await fetchUserData(address);
@@ -61,11 +64,15 @@ export async function GET() {
                     unrealizedPnl: position.position.unrealizedPnl,
                 }));
                 const portfolio = await fetchPortfolio(address);
+                const pnlHistory = portfolio.pnlHistory;
+                const lastPnl = pnlHistory[pnlHistory.length - 1][1];
+                const portfolioValue = portfolio.vlm;
                 return {
                     address,
                     totalRawUsd: data?.crossMarginSummary?.totalRawUsd,
                     positions: anyPositions || [],
-                    portfolio,
+                    portfolioValue,
+                    lastPnl
                 };
             })
         );
