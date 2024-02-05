@@ -26,6 +26,26 @@ async function fetchUserData(address: string) {
 
     return apiResponse.json();
 }
+async function fetchPortfolio(address: string) {
+    const body = {
+        type: 'portfolio',
+        user: address,
+    };
+    const apiResponse = await fetch(HYPERLIQUID_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        cache: 'no-cache',
+    });
+
+    if (!apiResponse.ok) {
+        throw new Error(`API responded with status: ${apiResponse.status}`);
+    }
+    const data = await apiResponse.json();
+    return data[3][1].vlm;
+}
 export async function GET() {
     try {
         let balances = await Promise.all(
@@ -40,10 +60,12 @@ export async function GET() {
                     liquidationPx: position.position.liquidationPx,
                     unrealizedPnl: position.position.unrealizedPnl,
                 }));
+                const portfolio = await fetchPortfolio(address);
                 return {
                     address,
                     totalRawUsd: data?.crossMarginSummary?.totalRawUsd,
                     positions: anyPositions || [],
+                    portfolio,
                 };
             })
         );
