@@ -22,8 +22,10 @@ import { useAddress } from "@/context/MetaMaskProvider";
 import FormAddress from "@/components/AddAddress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch"
+
 export default function Home() {
     const shortAddress = (address: string) => {
         return address.substring(0, 5) + '...' + address.substring(address.length - 4, address.length);
@@ -31,6 +33,24 @@ export default function Home() {
     const { data } = useAddress();
     const [priceEstimate, setPriceEstimate] = useState(0);
     const [volumeEstimate, setVolumeEstimate] = useState(0);
+    const [pointsUser, setPointsUser] = useState<any>({});
+    // Supposons que `data` est un tableau d'objets de portefeuille, chaque objet contenant une clé `address`.
+    const [switchPoints, setSwitchPoints] = useState<{ [address: string]: boolean }>({});
+    useEffect(() => {
+        // Assurez-vous que data n'est pas null avant de continuer
+        if (data) {
+            const initialSwitchStates = data.reduce((acc: { [address: string]: boolean }, wallet: any) => {
+                acc[wallet.address] = false; // Initialise tous les commutateurs comme non cochés
+                return acc;
+            }, {});
+            setSwitchPoints(initialSwitchStates);
+        }
+    }, [data]);
+
+    const handleSwitchChange = (address: string, checked: boolean) => {
+        setSwitchPoints(prev => ({ ...prev, [address]: checked }));
+    };
+
     return (
         <main className="flex flex-col min-h-screen items-center py-16 w-[90%] mx-auto">
             <div className="w-full max-w-lg">
@@ -81,6 +101,9 @@ export default function Home() {
                                 const address = shortAddress(wallet.address);
                                 const totalRawUsd = parseFloat(wallet.totalRawUsd).toFixed(2);
                                 const PnlFor1million = parseFloat(lastPnl) > 0 ? (parseFloat(lastPnl) * 1000000 / parseFloat(volume)).toFixed(2) : (parseFloat(lastPnl) * -1 * 1000000 / parseFloat(volume)).toFixed(2);
+                                const airdropValue = switchPoints[wallet.address]
+                                    ? (pointsUser[wallet.address] || 0) * priceEstimate
+                                    : (parseFloat(volume) / 1000000 * (priceEstimate * volumeEstimate));
                                 return (
                                     <Card key={address} className="bg-muted relative">
                                         <CardHeader className="w-[80%]">
@@ -91,18 +114,39 @@ export default function Home() {
                                             <CardDescription>Balance: <span className="text-primary">${totalRawUsd}</span> USD</CardDescription>
                                             <CardDescription>PNL: <span className="text-primary">${lastPnl}</span> USD</CardDescription>
                                             <CardDescription>Estimation PNL/1M: <span className="text-primary">${PnlFor1million}</span> USD</CardDescription>
+                                            <Switch
+                                                checked={switchPoints[wallet.address] || false}
+                                                onCheckedChange={(checked) => handleSwitchChange(wallet.address, checked)}
+                                            />
+
+                                            {
+                                                switchPoints[wallet.address] && (
+                                                    <div className="flex flex-col gap-1">
+                                                        <Label>Points</Label>
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="Enter your points"
+                                                            className="w-full"
+                                                            // Supposons que vous ayez un état pour stocker les points par adresse
+                                                            value={pointsUser[wallet.address] || 0}
+                                                            onChange={(e) => setPointsUser({ ...pointsUser, [wallet.address]: parseFloat(e.target.value) })}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+
                                             <div className="">
                                                 {
                                                     <p className="text-xl lg:text-3xl">
                                                         Airdrop: <span className="text-primary font-extrabold">
-                                                            ${(parseFloat(volume) / 1000000 * (priceEstimate * volumeEstimate)).toFixed(2)}
+                                                            ${airdropValue.toFixed(2)}
                                                         </span>
                                                     </p>
                                                 }
                                                 {
                                                     <p className="text-xl lg:text-3xl">
                                                         Value Net: <span className="text-primary font-extrabold">
-                                                            ${((parseFloat(volume) / 1000000 * (priceEstimate * volumeEstimate)) + parseFloat(lastPnl)).toFixed(2)}
+                                                            ${(airdropValue + parseFloat(lastPnl)).toFixed(2)}
                                                         </span>
                                                     </p>
                                                 }
