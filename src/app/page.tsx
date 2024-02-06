@@ -207,7 +207,7 @@ export default function Home() {
                                                 <p className="text-muted-foreground">No open positions</p>
                                             )}
                                         </CardContent>
-                                        <CardFooter>
+                                        <CardFooter className="flex flex-col">
                                             {wallet.positions.length > 0 && wallet.positions.map((position: any, index: number) => (
                                                 <Table key={index}>
                                                     <TableHeader>
