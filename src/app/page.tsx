@@ -145,6 +145,15 @@ export default function Home() {
                                 const airdropValue = switchPoints[wallet.address]
                                     ? (pointsUser[wallet.address] || 0) * priceEstimate
                                     : (parseFloat(volume) / 1000000 * (priceEstimate * volumeEstimate));
+                                const airdropValueUsd = airdropValue.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                });
+                                const valueNet = airdropValue + parseFloat(lastPnl);
+                                const valueNetUsd = valueNet.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                });
                                 return (
                                     <Card key={address} className="bg-muted relative">
                                         <CardHeader className="w-[80%]">
@@ -180,14 +189,14 @@ export default function Home() {
                                                 {
                                                     <p className="text-xl lg:text-3xl">
                                                         Airdrop: <span className="text-primary font-extrabold">
-                                                            ${airdropValue.toFixed(2)}
+                                                            ${airdropValueUsd}
                                                         </span>
                                                     </p>
                                                 }
                                                 {
                                                     <p className="text-xl lg:text-3xl">
                                                         Value Net: <span className="text-primary font-extrabold">
-                                                            ${(airdropValue + parseFloat(lastPnl)).toFixed(2)}
+                                                            ${valueNetUsd}
                                                         </span>
                                                     </p>
                                                 }
