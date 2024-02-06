@@ -3,13 +3,13 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 export const AddressContext = createContext<any>(null);
 export const AddressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [addresses, setAddresses] = useState<string[]>([]);
-    const [data, setData] = useState<any>(null);
+    const [balances, setBalances] = useState<any>(null);
     const [error, setError] = useState<any>(null);
     const value = {
         addresses,
-        data,
+        balances,
         error,
-        setData,
+        setBalances,
         setError,
         setAddresses
     };

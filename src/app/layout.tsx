@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Hyperliquid Airdrop ",
   description: "Hyperliquid airdrop, check your PNL, portfolio, volume and more.",
 };
+import { Toaster } from "@/components/ui/toaster"
 
 export default function RootLayout({
   children,
@@ -20,6 +21,7 @@ export default function RootLayout({
           <div className='flex-1 m-auto py-4 w-full'>
             {children}
           </div>
+          <Toaster />
         </AddressProvider>
       </body>
     </html>

@@ -25,12 +25,16 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch"
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useToast } from "@/components/ui/use-toast"
 
 export default function Home() {
     const shortAddress = (address: string) => {
         return address.substring(0, 5) + '...' + address.substring(address.length - 4, address.length);
     }
-    const { data } = useAddress();
+    const { data, error } = useSWR('/api/stats', fetcher);
+    const { toast } = useToast()
+    const { balances } = useAddress();
     const [priceEstimate, setPriceEstimate] = useState(0);
     const [volumeEstimate, setVolumeEstimate] = useState(0);
     const [pointsUser, setPointsUser] = useState<any>({});
@@ -38,14 +42,14 @@ export default function Home() {
     const [switchPoints, setSwitchPoints] = useState<{ [address: string]: boolean }>({});
     useEffect(() => {
         // Assurez-vous que data n'est pas null avant de continuer
-        if (data) {
-            const initialSwitchStates = data.reduce((acc: { [address: string]: boolean }, wallet: any) => {
+        if (balances) {
+            const initialSwitchStates = balances.reduce((acc: { [address: string]: boolean }, wallet: any) => {
                 acc[wallet.address] = false; // Initialise tous les commutateurs comme non cochés
                 return acc;
             }, {});
             setSwitchPoints(initialSwitchStates);
         }
-    }, [data]);
+    }, [balances]);
 
     const handleSwitchChange = (address: string, checked: boolean) => {
         setSwitchPoints(prev => ({ ...prev, [address]: checked }));
@@ -80,17 +84,54 @@ export default function Home() {
                 </div>
 
             </div>
+            {/* statistiques here 
+            {
+    "total_users": {
+        "total_users": 52632
+    },
+    "total_deposits": {
+        "total_deposits": 411431119.24924445
+    }
+}
+            */}
+            <div className="flex mt-4 w-full max-w-lg gap-4">
+                <div className="flex flex-col w-full gap-1">
+                    <Label>Total Users</Label>
+
+                    <Button
+                        className="w-full"
+                        onClick={() => toast({ title: `Total Users: ${data?.total_users.total_users}` })}>
+                        {
+                            data?.total_users.total_users.toFixed(2)
+                        }
+                    </Button>
+                </div>
+                <div className="flex flex-col w-full gap-1">
+                    <Label>Total Deposits</Label>
+                    {/*
+                    <Input
+                        type="number"
+                        placeholder="Total Deposits"
+                        className="w-full"
+                        value={data?.total_deposits.total_deposits.toFixed(2)}
+                        disabled
+                    /> */}
+                    <Button
+                        className="w-full"
+                        onClick={() => toast({ title: `Total Deposits: ${data?.total_deposits.total_deposits.toFixed(2)}` })}>{data?.total_deposits.total_deposits.toFixed(2)}</Button>
+                </div>
+            </div>
 
             <h1 className="text-5xl font-bold m-10">
-                <span className="text-primary">HYPERLIQUID</span> Balances
+                <span className="text-primary">HYPERLIQUID</span> Airdrop
             </h1>
 
             {
-                data && (
+                balances && (
                     <section className="grid lg:grid-cols-2 gap-4 w-[90%] mx-auto">
 
                         {
-                            data.map((wallet: any, index: any) => {
+                            balances.map((wallet: any, index: any) => {
                                 const volume = parseFloat(wallet.portfolioValue).toFixed(2);
                                 const volumeUsd = parseFloat(wallet.portfolioValue).toLocaleString('en-US', {
                                     minimumFractionDigits: 2,

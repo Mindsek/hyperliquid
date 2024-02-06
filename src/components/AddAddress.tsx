@@ -33,8 +33,8 @@ export default function FormAddress() {
     })
     const {
         addresses,
-        data,
-        setData,
+        balances,
+        setBalances,
         setAddresses
     } = useAddress();
 
@@ -66,7 +66,7 @@ export default function FormAddress() {
             const url = `/api/balance/${addressesToFetch.join('')}`;
             try {
                 const response = await fetcher(url);
-                setData(response);
+                setBalances(response);
             } catch (error) {
                 console.error("Failed to fetch balances:", error);
             }

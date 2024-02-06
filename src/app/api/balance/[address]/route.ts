@@ -44,15 +44,12 @@ async function fetchPortfolio(address: string) {
         throw new Error(`API responded with status: ${apiResponse.status}`);
     }
     const data = await apiResponse.json();
-    console.log(data);
     return data[3][1];
 }
 export async function GET(req: Request, context: any) {
     try {
         const { params } = context;
-        console.log(params);
         const addresses: string[] = params.address.match(/.{42}/g);
-        console.log(addresses);
         let balances = await Promise.all(
             addresses.map(async (address) => {
                 const data = await fetchUserData(address);
