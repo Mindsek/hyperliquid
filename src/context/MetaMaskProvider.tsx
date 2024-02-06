@@ -5,10 +5,13 @@ export const AddressProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [addresses, setAddresses] = useState<string[]>([]);
     const [balances, setBalances] = useState<any>(null);
     const [error, setError] = useState<any>(null);
+    const [volumeOverAll, setVolumeOverAll] = useState<any>(null);
     const value = {
         addresses,
         balances,
         error,
+        volumeOverAll,
+        setVolumeOverAll,
         setBalances,
         setError,
         setAddresses

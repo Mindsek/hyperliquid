@@ -27,7 +27,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch"
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 import { useToast } from "@/components/ui/use-toast"
-
+import ScrollingMenu from '@/components/ScrollingMenu';
+import TableVolume from "@/components/TableVolume";
 export default function Home() {
     const shortAddress = (address: string) => {
         return address.substring(0, 5) + '...' + address.substring(address.length - 4, address.length);
@@ -56,10 +57,13 @@ export default function Home() {
     };
 
     return (
-        <main className="flex flex-col min-h-screen items-center py-16 w-[90%] mx-auto">
+        <main className="flex flex-col min-h-screen items-center w-[90%] mx-auto">
+            {/* <ScrollingMenu /> */}
             <div className="w-full max-w-lg">
                 <FormAddress />
             </div>
+
+            <TableVolume />
 
             <div className="flex mt-4 w-full max-w-lg gap-4">
                 <div className="flex flex-col w-full gap-1">
@@ -84,20 +88,10 @@ export default function Home() {
                 </div>
 
             </div>
-            {/* statistiques here 
-            {
-    "total_users": {
-        "total_users": 52632
-    },
-    "total_deposits": {
-        "total_deposits": 411431119.24924445
-    }
-}
-            */}
+
             <div className="flex mt-4 w-full max-w-lg gap-4">
                 <div className="flex flex-col w-full gap-1">
                     <Label>Total Users</Label>
-
                     <Button
                         className="w-full"
                         onClick={() => toast({ title: `Total Users: ${data?.total_users.total_users}` })}>
@@ -108,14 +102,6 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col w-full gap-1">
                     <Label>Total Deposits</Label>
-                    {/*
-                    <Input
-                        type="number"
-                        placeholder="Total Deposits"
-                        className="w-full"
-                        value={data?.total_deposits.total_deposits.toFixed(2)}
-                        disabled
-                    /> */}
                     <Button
                         className="w-full"
                         onClick={() => toast({ title: `Total Deposits: ${data?.total_deposits.total_deposits.toFixed(2)}` })}>{data?.total_deposits.total_deposits.toFixed(2)}</Button>
