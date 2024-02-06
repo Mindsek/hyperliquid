@@ -244,6 +244,8 @@ export default function Home() {
                 )
             }
 
+            <iframe src="https://app.hyperliquid.xyz/leaderboard" className="w-full h-[100vh] m-10 border-4 rounded-lg border-primary"></iframe>
+
         </main>
     );
 }
